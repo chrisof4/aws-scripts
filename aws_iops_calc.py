@@ -71,7 +71,7 @@ def get_input():
             print(dbnum + ": " + dbname)
         menu_choice = input('Please enter a number between 1 and 6: ')
         if menu_choice.isdigit():
-            if int(menu_choice) >= 1 or int(menu_choice) <=6:
+            if int(menu_choice) >= 1 and int(menu_choice) <=6:
                 for db_type, db_details in sorted(rds_db_dict.items()):
                     dbnum = db_details['Menu Number']
                     if int(dbnum) == int(menu_choice):
