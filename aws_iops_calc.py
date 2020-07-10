@@ -1,5 +1,26 @@
+#!/usr/local/bin/python
+# -*- coding: UTF-8 -*-
+
+""" Description
+I wrote this script while studying for the AWS Solutions Architect - Associate
+exam. I was struggling with the math and rules surrounding RDS storage types 
+and instance selection as they relate to IO per second (IOPS), especially
+when it comes to gp2 storage. 
+The goal of this script is to query the user for RDS specifics and then feed 
+them back the minimum instance requirements. Hopefully they can use this as a 
+tool to ensure they choose the proper RDS instance.
+A secondary goal is to show the forumulas and DB specific information where
+appropriate so this can be used as a study aide to reinforce testable RDS 
+information. This script could also be used to check the results from manual 
+calculations while working on testable scenarios.
+"""
+
 from os import system, name
 import math
+
+__author__ = 'Chris Phillips'
+__copyright__ = "Copyright 2020, Chris Phillips AWS Tools"
+__email__ = 'chris.phillips2@cerner.com'
 
 # Global variable declarations
 user_input = []
