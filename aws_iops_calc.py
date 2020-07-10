@@ -23,6 +23,25 @@ __copyright__ = "Copyright 2020, Chris Phillips AWS Tools"
 __email__ = 'chris.phillips2@cerner.com'
 
 # Global variable declarations
+rds_db_dict = {}
+rds_db_dict = dict(Aurora = {'Name': 'Amazon Aurora',
+                            'Menu Number': '1',
+                            'Page Size': '16'},
+                   Maria = {'Name': 'MariaDB',
+                            'Menu Number': '2',
+                            'Page Size': '16'},
+                   MSSQL = {'Name': 'Microsoft SQL Server',
+                            'Menu Number': '3',
+                            'Page Size': '8'},
+                   MySQL = {'Name': 'MySQL',
+                            'Menu Number': '4',
+                            'Page Size': '16'},
+                   Oracle = {'Name': 'Oracle',
+                            'Menu Number': '5',
+                            'Page Size': '8'},
+                   PostgreSQL = {'Name': 'PostgreSQL',
+                                'Menu Number': '6',
+                                'Page Size': '8'})
 user_input = []
 db_instance_invalid = 'You must enter 1 or 2.\n'
 e_cont = 'Press <ENTER> to continue.'
