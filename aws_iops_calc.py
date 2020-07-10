@@ -7,8 +7,8 @@ exam. I was struggling with the math and rules surrounding RDS storage types
 and instance selection as they relate to IO per second (IOPS), especially
 when it comes to gp2 storage. 
 The goal of this script is to query the user for RDS specifics and then feed 
-them back the minimum instance requirements. Hopefully they can use this as a 
-tool to ensure they choose the proper RDS instance.
+the the minimum instance requirements back to the user. Hopefully they can use
+this as a tool to ensure they choose the proper RDS instance.
 A secondary goal is to show the forumulas and DB specific information where
 appropriate so this can be used as a study aide to reinforce testable RDS 
 information. This script could also be used to check the results from manual 
@@ -46,6 +46,7 @@ user_input = []
 db_instance_invalid = 'You must enter 1 or 2.\n'
 e_cont = 'Press <ENTER> to continue.'
 iops_invalid = 'IOPS must be an integer between 1000 and 40000.\n'
+menu_invalid = 'You must enter a number between 1 and 6.\n'
 page_num_invalid = 'The page number must be an integer between 1 and 32.\n'
 range_invalid = 'IOPS must be an integer, in an increment of 1000, and between 1000 and 40000\n'
 
@@ -54,33 +55,55 @@ def clear():
     if name == 'nt':
         _ = system('cls')
 
-def get_input():
+def main_screen():
     clear()
+    print('AWS RDS IOPS Calculator\n\n')
+
+def get_input():
     num_range = list(range(1000, 41000, 1000))
-    local_input = [0] * 3
+    local_input = [0] * 5
     while True:
-        local_input[0] = input('What type of storage will your DB use? (1 = gp2, 2 = Io1): ')
-        if local_input[0].isdigit():
-            if int(local_input[0]) == 1 or int(local_input[0]) == 2:
+        main_screen()
+        print('Which RDS service are you planning to use?\n')
+        for db_type, db_details in sorted(rds_db_dict.items()):
+            dbnum = db_details['Menu Number']
+            dbname = db_details['Name']
+            print(dbnum + ": " + dbname)
+        menu_choice = input('Please enter a number between 1 and 6: ')
+        if menu_choice.isdigit():
+            if int(menu_choice) >= 1 or int(menu_choice) <=6:
+                for db_type, db_details in sorted(rds_db_dict.items()):
+                    dbnum = db_details['Menu Number']
+                    if int(dbnum) == int(menu_choice):
+                        local_input[0] = db_type
+                break
+            else:
+                input('Not valid - ' + menu_invalid + e_cont)
+        else:
+            input('Not INT - ' + menu_invalid + e_cont)
+    while True:
+        local_input[1] = input('What type of storage will your DB use? (1 = gp2, 2 = Io1): ')
+        if local_input[1].isdigit():
+            if int(local_input[1]) == 1 or int(local_input[1]) == 2:
                 break
             else:
                 input('Not 1 or 2 - ' + db_instance_invalid + e_cont)
         else:
             input('Not INT - ' + db_instance_invalid + e_cont)
     while True:
-        local_input[1] = input('What is the database page size in KB?: ')
-        if local_input[1].isdigit():
-            if int(local_input[1]) > 0 and int(local_input[1]) < 33:
+        local_input[2] = input('What is the database page size in KB?: ')
+        if local_input[2].isdigit():
+            if int(local_input[2]) > 0 and int(local_input[2]) < 33:
                 break
             else:
                 input(page_num_invalid + e_cont)   
         else:
             input(page_num_invalid + e_cont)
     while True:
-        local_input[2] = input('What is the desired IOPS?: ')
-        if local_input[2].isdigit():
-            if int(local_input[0]) == 1:
-                if int(local_input[2]) > 0 and int(local_input[2]) <= 40000:
+        local_input[3] = input('What is the desired IOPS?: ')
+        if local_input[3].isdigit():
+            if int(local_input[1]) == 1:
+                if int(local_input[3]) > 0 and int(local_input[3]) <= 40000:
                     break
                 else:
                     input('Out of range - ' + iops_invalid + e_cont)
@@ -93,13 +116,14 @@ def get_input():
             input('Not INT - ' + iops_invalid + e_cont)
     return (local_input)
 
-def calc_db_instance(db_instance: int, page: int, iops: int):
+def calc_db_instance(rds_type: str, db_instance: int, page: int, iops: int):
     max_rps = iops * page
     gp2_volume_size = math.ceil(iops / 3)
     gp2_disk_throughput = math.ceil(iops * ((page * 8)/1000))
     io1_size = math.ceil(iops / 50)
     print(str(iops), 'IOPS and a page size of', str(page), 'will produce up to', str(max_rps), 
         'KB read per second.\n')
+    print('You plan to use the RDS type ' + rds_type)
     if db_instance == 1:
         print('Using gp2 storage, your DB instance will need the following:')
         print('\t1. A disk volume that is at least', str(gp2_volume_size), 'GB')
@@ -112,6 +136,6 @@ def calc_db_instance(db_instance: int, page: int, iops: int):
 
 # Script execution
 user_input = get_input()
-calc_db_instance(db_instance = int(user_input[0]), page = int(user_input[1]), iops = int(user_input[2]))
+calc_db_instance(rds_type = str(user_input[0]), db_instance = int(user_input[1]), page = int(user_input[2]), iops = int(user_input[3]))
 
 
