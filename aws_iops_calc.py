@@ -171,9 +171,14 @@ def calc_db_instance(rds_type: str, page: int, iops: int):
             str(gp2_disk_throughput), 
             'Mbps.')
     print('\t(IOPS * ((page size * 8)/1000))\n')
-    print('If you choose general-purpose SSD (gp2) storage, your DB instance will need') 
-    print('  a disk volume that is at least', str(gp2_volume_size), 'GB.')
-    print('\t(disk size = IOPS/3 (3 IOPS per GB up to 10000 IOPS per volume))\n')
+    if int(iops) > 10000 or int(gp2_disk_throughput) > 1280:
+        print('General-purpose SSD (gp2) is not a valid option as it does not support more than:')
+        print('\t- 10,000 IOPS')
+        print('\t- 1,280 Mbps throughput.\n')
+    else:
+        print('If you choose general-purpose SSD (gp2) storage, your DB instance will need') 
+        print('  a disk volume that is at least', str(gp2_volume_size), 'GB.')
+        print('\t(disk size = IOPS/3 (3 IOPS per GB up to 10000 IOPS per volume))\n')
     print('If you choose provisioned IOPS (Io1) storage, your DB instance will need')
     print('  a disk volume that is at least', str(io1_size), 'GB.')
     print('\t(disk size = IOPS/50)')
