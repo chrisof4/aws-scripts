@@ -117,27 +117,27 @@ def get_input():
         else:
             input('Not INT - ' + menu_invalid + e_cont)
     while True:
-        local_input[2] = input('What is the database page size in KB (default ' + page_in_kb + '): ')
-        if len(local_input[2]) == 0:
-            local_input[2] = page_in_kb
+        local_input[1] = input('What is the database page size in KB (default ' + page_in_kb + '): ')
+        if len(local_input[1]) == 0:
+            local_input[1] = page_in_kb
             break
         else:
-            if local_input[2].isdigit():
-                if int(local_input[2]) > 0 and int(local_input[2]) < 33:
+            if local_input[1].isdigit():
+                if int(local_input[1]) > 0 and int(local_input[1]) < 33:
                     break
                 else:
                     input(page_num_invalid + e_cont)   
             else:
                 input(page_num_invalid + e_cont)
     while True:
-        local_input[3] = input('What is the desired IOPS?: ')
-        if local_input[3].isdigit():
+        local_input[2] = input('What is the desired IOPS?: ')
+        if local_input[2].isdigit():
             if str(local_input[0]) != 'Microsoft SQL Server':
-                if int(local_input[3]) > 60 and int(local_input[3]) <= 40000:
+                if int(local_input[2]) > 60 and int(local_input[2]) <= 40000:
                     break
                 else:
                     input('Out of range - ' + iops_invalid + e_cont)
-            elif int(local_input[3]) > 600 and int(local_input[3]) <= 32000:
+            elif int(local_input[2]) > 600 and int(local_input[2]) <= 32000:
                     break
             else:
                 input('Out of range - ' + iops_invalid_sql + e_cont)
@@ -193,6 +193,6 @@ script_intro()
 user_input = get_input()
 calc_db_instance(
                 rds_type = str(user_input[0]), 
-                page = int(user_input[2]), 
-                iops = int(user_input[3])
+                page = int(user_input[1]), 
+                iops = int(user_input[2])
                 )
