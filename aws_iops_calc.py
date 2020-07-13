@@ -59,6 +59,34 @@ def main_screen():
     clear()
     print('AWS RDS IOPS Calculator\n\n')
 
+# The function introduces the user to the script and explains what information
+# they need to provide.
+def script_intro():
+    main_screen()
+    print('''
+When building a database using Amazon RDS you need to define the server
+instance type, the type of storage, and the amount of storage. These work
+together to provide the best peformance at the least cost. If you don't 
+understand how these work with each other, you run the risk of creating 
+performance bottlenecks, or buying to0 much of the wrong resources.
+You will do the best job of balancing cost and performance if you can provide
+accurate information about several key factors.  
+At a minimum you will need to know the following:
+\t1. Which RDS database you plan to use 
+\t\t(Aurora, MariaDB, Microsoft SQL, MySQL, Oracle, or PostgreSQL)
+\t2. The database page size in KB (if using gp2 storage).
+\t3. The desired IOPS (Input/output Operations Per Second).t
+\t4. The type of storage you plan to use (gp2 or Io1).
+\n
+Accurate data in the above areas will help you make the best choices regarding
+how much disk space you need and which DB instance to choose.
+''')
+    x=input('\nPress any key when ready to begin or "Q" to exit: ')
+    if x == str("q") or x == str("Q"):
+        exit()
+    else:
+        return(None)
+
 # This collects the necessary input from the user, validates the data and 
 # returns the user's input as a list.
 def get_input():
@@ -125,6 +153,7 @@ def calc_db_instance(rds_type: str, db_instance: int, page: int, iops: int):
     gp2_volume_size = math.ceil(iops / 3)
     gp2_disk_throughput = math.ceil(iops * ((page * 8)/1000))
     io1_size = math.ceil(iops / 50)
+    main_screen()
     print(str(iops), 'IOPS and a page size of', str(page), 'will produce up to', str(max_rps), 
         'KB read per second.\n')
     print('You plan to use the RDS type ' + rds_type)
@@ -139,6 +168,7 @@ def calc_db_instance(rds_type: str, db_instance: int, page: int, iops: int):
     return None
 
 # Script execution
+script_intro()
 user_input = get_input()
 calc_db_instance(rds_type = str(user_input[0]), db_instance = int(user_input[1]), page = int(user_input[2]), iops = int(user_input[3]))
 
