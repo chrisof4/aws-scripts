@@ -8,8 +8,8 @@ and instance selection as they relate to IO per second (IOPS), especially
 when it comes to gp2 storage. 
 The goal of this script is to query the user for RDS specifics and then feed 
 the the minimum instance requirements back to the user. Hopefully they can use
-this as a tool to ensure they choose the proper RDS instance.
-A secondary goal is to show the forumulas and DB specific information where
+this as a tool to ensure they choose the proper RDS storage type and size.
+A secondary goal is to show the forumulas and other specific information where
 appropriate so this can be used as a study aide to reinforce testable RDS 
 information. This script could also be used to check the results from manual 
 calculations while working on testable scenarios.
