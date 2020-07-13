@@ -81,7 +81,7 @@ At a minimum you will need to know the following:
         (Aurora, MariaDB, Microsoft SQL, MySQL, Oracle, or PostgreSQL)
     2. The database page size in KB (if using gp2 storage).
     3. The desired IOPS (Input/output Operations Per Second).t
-    4. The type of storage you plan to use (gp2 or Io1).
+    4. The type of storage you plan to use (gp2 or io1).
 
 Accurate data in the above areas will help you make the best choices regarding
 how much disk space you need and which DB instance to choose.
@@ -95,7 +95,6 @@ how much disk space you need and which DB instance to choose.
 # This collects the necessary input from the user, validates the data and 
 # returns the user's input as a list.
 def get_input():
-    num_range = list(range(1000, 41000, 1000))
     local_input = [0] * 5
     while True:
         main_screen()
@@ -152,7 +151,8 @@ def calc_db_instance(rds_type: str, page: int, iops: int):
     max_rps = iops * page
     gp2_volume_size = math.ceil(iops / 3)
     gp2_disk_throughput = math.ceil(iops * ((page * 8)/1000))
-    io1_size = math.ceil(iops / 50)
+    io1_iops = int(math.ceil(iops / 1000)) * 1000
+    io1_size = io1_iops / 50
     main_screen()
     print('You plan to use the RDS type ' 
             + str(rds_type)
@@ -171,17 +171,20 @@ def calc_db_instance(rds_type: str, page: int, iops: int):
             str(gp2_disk_throughput), 
             'Mbps.')
     print('\t(IOPS * ((page size * 8)/1000))\n')
+    print('General-purpose SSD (gp2) storage --')
     if int(iops) > 10000 or int(gp2_disk_throughput) > 1280:
-        print('General-purpose SSD (gp2) is not a valid option as it does not support more than:')
-        print('\t- 10,000 IOPS')
-        print('\t- 1,280 Mbps throughput.\n')
+        print('\tgp2 is not a valid option as it does not support more than:')
+        print('\t\t- 10,000 IOPS')
+        print('\t\t- 1,280 Mbps throughput.\n')
     else:
-        print('If you choose general-purpose SSD (gp2) storage, your DB instance will need') 
-        print('  a disk volume that is at least', str(gp2_volume_size), 'GB.')
+        print('\tIf you choose gp2 storage, your DB instance will need') 
+        print('\t  a disk volume that is at least', str(gp2_volume_size), 'GB.')
         print('\t(disk size = IOPS/3 (3 IOPS per GB up to 10000 IOPS per volume))\n')
-    print('If you choose provisioned IOPS (Io1) storage, your DB instance will need')
-    print('  a disk volume that is at least', str(io1_size), 'GB.')
-    print('\t(disk size = IOPS/50)')
+    print('Provisioned IOPS SSD (io1) --')
+    if io1_iops != iops:
+        print('io1 storage can only be allocated in IOPS units of 1000. Your IOPS was rounded up to ' + str(io1_iops))
+    print('\tIf you choose io1 storage, your DB instance will need')
+    print('\t  a disk volume that is at least', str(io1_size), 'GB (disk size = IOPS/50).')
     print('\t(50 IOPS/GB up to 32,000 for MS SQL and 40,000 for all others.)')
     return None
 
