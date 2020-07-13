@@ -45,7 +45,8 @@ rds_db_dict = dict(Aurora = {'Name': 'Amazon Aurora',
 user_input = []
 db_instance_invalid = 'You must enter 1 or 2.\n'
 e_cont = 'Press <ENTER> to continue.'
-iops_invalid = 'IOPS must be an integer between 1000 and 40000.\n'
+iops_invalid = 'IOPS must be an integer between 60 and 40000.\n'
+iops_invalid_sql = 'IOPS must be an integer between 600 and 32000.\n'
 menu_invalid = 'You must enter a number between 1 and 6.\n'
 page_num_invalid = 'The page number must be an integer between 1 and 32.\n'
 range_invalid = 'IOPS must be an integer, in an increment of 1000, and between 1000 and 40000\n'
@@ -64,20 +65,24 @@ def main_screen():
 def script_intro():
     main_screen()
     print('''
-When building a database using Amazon RDS you need to define the server
-instance type, the type of storage, and the amount of storage. These work
-together to provide the best peformance at the least cost. If you don't 
-understand how these work with each other, you run the risk of creating 
-performance bottlenecks, or buying to0 much of the wrong resources.
+When building a database using Amazon RDS you need to define:
+    1. The server instance type
+    2. The type of storage
+    3. The amount of storage.
+
+These work together to provide the best peformance at the least cost. If you 
+don't understand how these work with each other, you run the risk of creating
+performance bottlenecks, or buying too much of the wrong resources.
 You will do the best job of balancing cost and performance if you can provide
 accurate information about several key factors.  
+
 At a minimum you will need to know the following:
-\t1. Which RDS database you plan to use 
-\t\t(Aurora, MariaDB, Microsoft SQL, MySQL, Oracle, or PostgreSQL)
-\t2. The database page size in KB (if using gp2 storage).
-\t3. The desired IOPS (Input/output Operations Per Second).t
-\t4. The type of storage you plan to use (gp2 or Io1).
-\n
+    1. Which RDS database you plan to use 
+        (Aurora, MariaDB, Microsoft SQL, MySQL, Oracle, or PostgreSQL)
+    2. The database page size in KB (if using gp2 storage).
+    3. The desired IOPS (Input/output Operations Per Second).t
+    4. The type of storage you plan to use (gp2 or Io1).
+
 Accurate data in the above areas will help you make the best choices regarding
 how much disk space you need and which DB instance to choose.
 ''')
@@ -113,15 +118,6 @@ def get_input():
         else:
             input('Not INT - ' + menu_invalid + e_cont)
     while True:
-        local_input[1] = input('What type of storage will your DB use? (1 = gp2, 2 = Io1): ')
-        if local_input[1].isdigit():
-            if int(local_input[1]) == 1 or int(local_input[1]) == 2:
-                break
-            else:
-                input('Not 1 or 2 - ' + db_instance_invalid + e_cont)
-        else:
-            input('Not INT - ' + db_instance_invalid + e_cont)
-    while True:
         local_input[2] = input('What is the database page size in KB (default ' + page_in_kb + '): ')
         if len(local_input[2]) == 0:
             local_input[2] = page_in_kb
@@ -137,23 +133,22 @@ def get_input():
     while True:
         local_input[3] = input('What is the desired IOPS?: ')
         if local_input[3].isdigit():
-            if int(local_input[1]) == 1:
-                if int(local_input[3]) > 0 and int(local_input[3]) <= 40000:
+            if str(local_input[0]) != 'Microsoft SQL Server':
+                if int(local_input[3]) > 60 and int(local_input[3]) <= 40000:
                     break
                 else:
                     input('Out of range - ' + iops_invalid + e_cont)
-            else:
-                if int(local_input[3]) in num_range:
+            elif int(local_input[3]) > 600 and int(local_input[3]) <= 32000:
                     break
-                else:
-                    input('Not 1000 - ' + range_invalid + e_cont)
+            else:
+                input('Out of range - ' + iops_invalid_sql + e_cont)
         else:
             input('Not INT - ' + iops_invalid + e_cont)
     return (local_input)
 
 # This functions performs calculations based on the user's input and 
 # provides the output to the user.
-def calc_db_instance(rds_type: str, db_instance: int, page: int, iops: int):
+def calc_db_instance(rds_type: str, page: int, iops: int):
     max_rps = iops * page
     gp2_volume_size = math.ceil(iops / 3)
     gp2_disk_throughput = math.ceil(iops * ((page * 8)/1000))
@@ -182,7 +177,7 @@ def calc_db_instance(rds_type: str, db_instance: int, page: int, iops: int):
     print('If you choose provisioned IOPS (Io1) storage, your DB instance will need')
     print('  a disk volume that is at least', str(io1_size), 'GB.')
     print('\t(disk size = IOPS/50)')
-    print('\t(50 IOPS per GB up to 32K for MS SQL and 40K for all others.)')
+    print('\t(50 IOPS/GB up to 32,000 for MS SQL and 40,000 for all others.)')
     return None
 
 # Script execution
@@ -190,7 +185,6 @@ script_intro()
 user_input = get_input()
 calc_db_instance(
                 rds_type = str(user_input[0]), 
-                db_instance = int(user_input[1]), 
                 page = int(user_input[2]), 
                 iops = int(user_input[3])
                 )
