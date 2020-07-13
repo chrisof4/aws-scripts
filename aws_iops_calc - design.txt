@@ -1,4 +1,13 @@
+What type of RDS DB do you plan to use? (provide list)
 What is the page size in KB?
 Desired IOPS?
 Return minimum volume size.
 Return minimum disk throughput.
+
+Future work:
+1. default page size based on RDS choice.
+2. for Io1 IOPS range is 1000-32000 for MsSQL. (pg. 106)
+3. reset screen before presenting output.
+4. Include formulas in output and other educational information.
+5. If disk throughput is greater than 10K, recommend memory optimized which can handle up to 14K. (pg. 102)
+5. If IOPS is less than 3K, recommend burst capable (pg. 102)

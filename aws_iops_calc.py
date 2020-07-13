@@ -59,6 +59,8 @@ def main_screen():
     clear()
     print('AWS RDS IOPS Calculator\n\n')
 
+# This collects the necessary input from the user, validates the data and 
+# returns the user's input as a list.
 def get_input():
     num_range = list(range(1000, 41000, 1000))
     local_input = [0] * 5
@@ -116,6 +118,8 @@ def get_input():
             input('Not INT - ' + iops_invalid + e_cont)
     return (local_input)
 
+# This functions performs calculations based on the user's input and 
+# provides the output to the user.
 def calc_db_instance(rds_type: str, db_instance: int, page: int, iops: int):
     max_rps = iops * page
     gp2_volume_size = math.ceil(iops / 3)
