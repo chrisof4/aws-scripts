@@ -5,9 +5,29 @@ Return minimum volume size.
 Return minimum disk throughput.
 
 Future work:
-1. default page size based on RDS choice.
-2. for Io1 IOPS range is 1000-32000 for MsSQL. (pg. 106)
-3. reset screen before presenting output.
-4. Include formulas in output and other educational information.
+1. (done) default page size based on RDS choice.
+2. (done) for Io1 IOPS range is 1000-32000 for MsSQL. (pg. 106)
+3. (done) reset screen before presenting output.
+4. (done) Include formulas in output and other educational information.
 5. If disk throughput is greater than 10K, recommend memory optimized which can handle up to 14K. (pg. 102)
 5. If IOPS is less than 3K, recommend burst capable (pg. 102)
+6. (done) Provide more detailed information up front to enable user to make the best choices?
+7. (done) Don't prompt user for storage type. Instead, present both options in output.
+
+
+When building a database using Amazon RDS you need to define the server
+instance type, the type of storage, and the amount of storage. These work
+together to provide the best peformance at the least cost. If you don't 
+understand how these work with each other, you run the risk of creating 
+performance bottlenecks, or buying to much of the wrong resources.
+You will do the best job of balancing cost and performance if you can provide
+accurate information about several key factors.  
+At a minimum you will need to know the following:
+1. Which RDS database you plan to use 
+\t(Aurora, MariaDB, Microsoft SQL, MySQL, Oracle, or PostgreSQL)
+2. The database page size in KB (if using gp2 storage).
+3. The desired IOPS (Input/output Operations Per Second).
+4. The type of storage you plan to use (gp2 or Io1).
+
+Accurate data in the above areas will help you make the best choices regarding
+how much disk space you need and which DB instance to choose.
