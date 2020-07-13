@@ -105,7 +105,7 @@ def get_input():
                 for db_type, db_details in sorted(rds_db_dict.items()):
                     dbnum = db_details['Menu Number']
                     if int(dbnum) == int(menu_choice):
-                        local_input[0] = db_type
+                        local_input[0] = db_details['Name']
                         page_in_kb = db_details['Page Size']
                 break
             else:
@@ -143,7 +143,7 @@ def get_input():
                 else:
                     input('Out of range - ' + iops_invalid + e_cont)
             else:
-                if int(local_input[2]) in num_range:
+                if int(local_input[3]) in num_range:
                     break
                 else:
                     input('Not 1000 - ' + range_invalid + e_cont)
@@ -159,20 +159,38 @@ def calc_db_instance(rds_type: str, db_instance: int, page: int, iops: int):
     gp2_disk_throughput = math.ceil(iops * ((page * 8)/1000))
     io1_size = math.ceil(iops / 50)
     main_screen()
-    print(str(iops), 'IOPS and a page size of', str(page), 'will produce up to', str(max_rps), 
-        'KB read per second.\n')
-    print('You plan to use the RDS type ' + rds_type)
-    if db_instance == 1:
-        print('Using gp2 storage, your DB instance will need the following:')
-        print('\t1. A disk volume that is at least', str(gp2_volume_size), 'GB')
-        print('\t2. Disk throughput of at least', str(gp2_disk_throughput), 'Mbps\n')
-    else:
-        print('Using Io1 storage (provisioned IOPS), your DB instance will need the following:')
-        print('\t1. A disk volume that is at least', str(io1_size), 'GB')
-        print('\t2. Disk throughput of at least', str(gp2_disk_throughput), 'Mbps\n')
+    print('You plan to use the RDS type ' 
+            + str(rds_type)
+            + ' with a page size of ' 
+            + str(page)
+            + 'KB.\n')
+    print(str(iops), 
+            'IOPS multiplied by a page size of', 
+            str(page), 
+            'KB will produce\n  up to', 
+            str(max_rps),
+            'KB read per second.')
+    print('To achieve ' 
+            + str(iops),
+            'IOPS you will need disk throughput of at least', 
+            str(gp2_disk_throughput), 
+            'Mbps.')
+    print('\t(IOPS * ((page size * 8)/1000))\n')
+    print('If you choose general-purpose SSD (gp2) storage, your DB instance will need') 
+    print('  a disk volume that is at least', str(gp2_volume_size), 'GB.')
+    print('\t(disk size = IOPS/3 (3 IOPS per GB up to 10000 IOPS per volume))\n')
+    print('If you choose provisioned IOPS (Io1) storage, your DB instance will need')
+    print('  a disk volume that is at least', str(io1_size), 'GB.')
+    print('\t(disk size = IOPS/50)')
+    print('\t(50 IOPS per GB up to 32K for MS SQL and 40K for all others.)')
     return None
 
 # Script execution
 script_intro()
 user_input = get_input()
-calc_db_instance(rds_type = str(user_input[0]), db_instance = int(user_input[1]), page = int(user_input[2]), iops = int(user_input[3]))
+calc_db_instance(
+                rds_type = str(user_input[0]), 
+                db_instance = int(user_input[1]), 
+                page = int(user_input[2]), 
+                iops = int(user_input[3])
+                )
