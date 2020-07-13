@@ -106,6 +106,7 @@ def get_input():
                     dbnum = db_details['Menu Number']
                     if int(dbnum) == int(menu_choice):
                         local_input[0] = db_type
+                        page_in_kb = db_details['Page Size']
                 break
             else:
                 input('Not valid - ' + menu_invalid + e_cont)
@@ -121,14 +122,18 @@ def get_input():
         else:
             input('Not INT - ' + db_instance_invalid + e_cont)
     while True:
-        local_input[2] = input('What is the database page size in KB?: ')
-        if local_input[2].isdigit():
-            if int(local_input[2]) > 0 and int(local_input[2]) < 33:
-                break
-            else:
-                input(page_num_invalid + e_cont)   
+        local_input[2] = input('What is the database page size in KB (default ' + page_in_kb + '): ')
+        if len(local_input[2]) == 0:
+            local_input[2] = page_in_kb
+            break
         else:
-            input(page_num_invalid + e_cont)
+            if local_input[2].isdigit():
+                if int(local_input[2]) > 0 and int(local_input[2]) < 33:
+                    break
+                else:
+                    input(page_num_invalid + e_cont)   
+            else:
+                input(page_num_invalid + e_cont)
     while True:
         local_input[3] = input('What is the desired IOPS?: ')
         if local_input[3].isdigit():
@@ -171,5 +176,3 @@ def calc_db_instance(rds_type: str, db_instance: int, page: int, iops: int):
 script_intro()
 user_input = get_input()
 calc_db_instance(rds_type = str(user_input[0]), db_instance = int(user_input[1]), page = int(user_input[2]), iops = int(user_input[3]))
-
-
